@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.streamlit/secrets.toml
+nltk_data/
+outputs/*.png
+outputs/*.html
+outputs/.matplotlib/
+*.pdf
+*.docx
+*.pptx
+*.ppt
+*.log
+.DS_Store
+Thumbs.db

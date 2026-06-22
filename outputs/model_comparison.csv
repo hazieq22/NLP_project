@@ -1,0 +1,5 @@
+model,accuracy,precision,recall,f1_score
+TF-IDF N-grams + Linear SVM,0.9192,0.9192,0.9192,0.9192
+TF-IDF + Logistic Regression,0.8947,0.8948,0.8947,0.8947
+TF-IDF + Naive Bayes,0.8565,0.8567,0.8565,0.8565
+BoW + Naive Bayes,0.8503,0.8509,0.8503,0.8502
