@@ -1041,7 +1041,7 @@ if page == "Home/About":
     )
     team_3_photo = image_to_data_uri(BASE_DIR / "assets/team/hassan.png")
     team_3_photo_markup = (
-        f'<img src="{team_3_photo}" alt="MUHAMMAD HASSAN NAEIK BIN NORIZAN">'
+        f'<img src="{team_3_photo}" alt="MUHAMMAD HASSAN NAEIM BIN NORIZAN">'
         if team_3_photo
         else "Image"
     )
@@ -1151,7 +1151,7 @@ if page == "Home/About":
             </div>
             <div class="team-card">
                 <div class="team-photo-slot">__TEAM_3_PHOTO__</div>
-                <p class="team-name">MUHAMMAD HASSAN NAEIK BIN NORIZAN</p>
+                <p class="team-name">MUHAMMAD HASSAN NAEIM BIN NORIZAN</p>
                 <p class="team-matric">A24AI0056</p>
             </div>
             <div class="team-card">
