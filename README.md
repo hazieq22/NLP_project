@@ -143,7 +143,7 @@ Run this once to download the pretrained DistilBERT sentiment model, then restar
 
 - Hazieq Aiman Bin Hamizi - A24AI0033
 - Nik Muhammad Faris Bin Nik Zaki - A24AI0070
-- Muhammad Hassan Naeik Bin Norizan - A24AI0056
+- Muhammad Hassan Naeim Bin Norizan - A24AI0056
 - Nik Muhammad Muqri Hazim Bin Nik Nor Ahmarizam - A24AI0071
 
 ## References
