@@ -11,6 +11,7 @@ import numpy as np
 import pandas as pd
 import plotly.express as px
 import streamlit as st
+import streamlit.components.v1 as components
 from wordcloud import WordCloud
 
 from src.data_utils import load_or_create_dataset
@@ -72,7 +73,7 @@ st.set_page_config(
     page_title="Sentiment · Film Intelligence",
     page_icon="◈",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="collapsed",
 )
 
 # ── XNRGY-inspired dark editorial theme ──────────────────────────────────────
@@ -479,10 +480,10 @@ p, .stMarkdown p {
 }
 
 /* ── Radio buttons (sidebar nav) ── */
-[data-testid="stRadio"] > div {
+[data-testid="stSidebar"] [data-testid="stRadio"] > div {
     gap: 0 !important;
 }
-[data-testid="stRadio"] label {
+[data-testid="stSidebar"] [data-testid="stRadio"] label {
     padding: 0.6rem 0 !important;
     border-bottom: 1px solid #1a1a1a !important;
 }
@@ -821,8 +822,8 @@ def render_animated_home_metrics(total_reviews: int, best_model: str, best_accur
 bundle = load_model_bundle(MODEL_PATH.stat().st_mtime if MODEL_PATH.exists() else 0.0)
 df = load_dataset()
 
-st.sidebar.markdown("""
-<div style="padding: 2rem 0 1.5rem 0;">
+st.markdown("""
+<div style="display: none;">
     <p style="
         font-family: 'Barlow Condensed', sans-serif;
         font-size: 0.6rem;
@@ -844,17 +845,176 @@ st.sidebar.markdown("""
     ">Sentiment</p>
 </div>
 """, unsafe_allow_html=True)
-page = st.sidebar.radio(
-    "Navigate",
-    ["Home/About", "Text Analyzer", "Data Explorer", "Visualizations", "Model Info"],
-)
+page = "Home/About"
+
+st.markdown("""
+<style>
+[data-testid="stSidebar"],
+[data-testid="collapsedControl"],
+[data-testid="stSidebarCollapseButton"] {
+    display: none !important;
+}
+
+div[data-testid="stHorizontalBlock"]:has(.top-nav-brand) {
+    position: sticky;
+    top: 3rem;
+    z-index: 100;
+    align-items: center;
+    gap: 1.5rem;
+    width: 100%;
+    margin: -1.5rem 0 2.75rem 0;
+    padding: 0.8rem 0;
+    background: rgba(12, 12, 12, 0.94);
+    border-top: 1px solid #1f1f1f;
+    border-bottom: 1px solid #2a2a2a;
+    backdrop-filter: blur(12px);
+}
+
+.top-nav-brand {
+    min-height: 2.65rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.top-nav-kicker {
+    margin: 0 0 0.12rem 0;
+    color: #584f46;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.58rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.top-nav-title {
+    margin: 0;
+    color: #e8e3dc;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    line-height: 1;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+div[data-testid="stHorizontalBlock"]:has(.top-nav-brand)
+div[data-testid="stRadio"] [role="radiogroup"] {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1.15rem;
+    width: 100%;
+}
+
+div[data-testid="stHorizontalBlock"]:has(.top-nav-brand)
+div[data-testid="stRadio"] [role="radiogroup"] label {
+    min-height: 2.65rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0.55rem 0.12rem;
+    border: 0;
+    border-bottom: 1px solid transparent;
+    background: transparent;
+    cursor: pointer;
+    transition: color 0.18s ease, background-color 0.18s ease, border-color 0.18s ease;
+}
+
+div[data-testid="stHorizontalBlock"]:has(.top-nav-brand)
+div[data-testid="stRadio"] [role="radiogroup"] label > div:first-child {
+    display: none !important;
+}
+
+div[data-testid="stHorizontalBlock"]:has(.top-nav-brand)
+div[data-testid="stRadio"] [role="radiogroup"] label p {
+    margin: 0;
+    color: #8b827a;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    line-height: 1.1;
+    text-align: center;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+div[data-testid="stHorizontalBlock"]:has(.top-nav-brand)
+div[data-testid="stRadio"] [role="radiogroup"] label:hover {
+    background: transparent;
+    border-bottom-color: rgba(200, 184, 154, 0.5);
+}
+
+div[data-testid="stHorizontalBlock"]:has(.top-nav-brand)
+div[data-testid="stRadio"] [role="radiogroup"] label:hover p {
+    color: #c8b89a;
+}
+
+div[data-testid="stHorizontalBlock"]:has(.top-nav-brand)
+div[data-testid="stRadio"] [role="radiogroup"] label[data-checked="true"],
+div[data-testid="stHorizontalBlock"]:has(.top-nav-brand)
+div[data-testid="stRadio"] [role="radiogroup"] label:has(input:checked) {
+    background: transparent;
+    border-bottom-color: #c8b89a;
+}
+
+div[data-testid="stHorizontalBlock"]:has(.top-nav-brand)
+div[data-testid="stRadio"] [role="radiogroup"] label[data-checked="true"] p,
+div[data-testid="stHorizontalBlock"]:has(.top-nav-brand)
+div[data-testid="stRadio"] [role="radiogroup"] label:has(input:checked) p {
+    color: #e8e3dc;
+}
+
+@media (max-width: 850px) {
+    div[data-testid="stHorizontalBlock"]:has(.top-nav-brand) {
+        position: relative;
+        top: 0;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.65rem;
+        margin-top: -1.5rem;
+    }
+
+    div[data-testid="stHorizontalBlock"]:has(.top-nav-brand)
+    div[data-testid="stRadio"] [role="radiogroup"] {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    div[data-testid="stHorizontalBlock"]:has(.top-nav-brand)
+    div[data-testid="stRadio"] [role="radiogroup"] label p {
+        white-space: normal;
+    }
+}
+</style>
+""", unsafe_allow_html=True)
+
+brand_column, navigation_column = st.columns([1.35, 3.65])
+with brand_column:
+    st.markdown(
+        """
+        <div class="top-nav-brand">
+            <p class="top-nav-kicker">NLP · Film Intelligence</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+with navigation_column:
+    page = st.radio(
+        "Navigate",
+        ["Home/About", "Text Analyzer", "Data Explorer", "Visualizations", "Model Info"],
+        horizontal=True,
+        label_visibility="collapsed",
+    )
 
 if not require_artifacts(bundle, df):
     st.stop()
 
 assert bundle is not None
 
-# Liquid smoke animated background for every page.
+# Three.js wireframe background for every page.
 st.markdown("""
 <style>
 .main .block-container,
@@ -863,70 +1023,217 @@ st.markdown("""
     z-index: 2;
 }
 
-.app-motion-field {
+#bg-canvas {
     position: fixed;
-    inset: 0;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
     z-index: 0;
     pointer-events: none;
-    overflow: hidden;
-    opacity: 0.62;
-    background:
-        linear-gradient(115deg, rgba(200, 184, 154, 0.10), transparent 34%),
-        linear-gradient(245deg, rgba(122, 167, 255, 0.07), transparent 38%),
-        #0c0c0c;
 }
 
-.app-motion-field::before {
-    content: "";
-    position: absolute;
-    inset: -45%;
-    background:
-        conic-gradient(
-            from 120deg at 50% 50%,
-            transparent 0deg,
-            rgba(200, 184, 154, 0.22) 44deg,
-            transparent 96deg,
-            rgba(232, 227, 220, 0.10) 156deg,
-            transparent 218deg,
-            rgba(255, 107, 107, 0.10) 288deg,
-            transparent 360deg
-        );
-    filter: blur(48px);
-    opacity: 0.72;
-    transform-origin: center;
-    animation: liquidSmokeTurn 34s ease-in-out infinite alternate;
-}
-
-.app-motion-field::after {
-    content: "";
-    position: absolute;
-    inset: -18%;
-    background:
-        repeating-linear-gradient(
-            108deg,
-            transparent 0 26px,
-            rgba(232, 227, 220, 0.055) 26px 28px,
-            transparent 28px 118px
-        );
-    filter: blur(12px);
-    opacity: 0.42;
-    animation: liquidSmokeDrift 18s linear infinite;
-}
-
-@keyframes liquidSmokeTurn {
-    0% { transform: translate3d(-5%, -4%, 0) rotate(0deg) scale(1.06); }
-    50% { transform: translate3d(4%, 3%, 0) rotate(18deg) scale(1.16); }
-    100% { transform: translate3d(-2%, 5%, 0) rotate(-14deg) scale(1.10); }
-}
-
-@keyframes liquidSmokeDrift {
-    0% { transform: translate3d(-7%, -3%, 0); }
-    100% { transform: translate3d(7%, 4%, 0); }
+#bg-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+    pointer-events: none;
+    background: rgba(12, 12, 12, 0.28);
 }
 </style>
 
-<div class="app-motion-field" aria-hidden="true"></div>
+<canvas id="bg-canvas" aria-hidden="true"></canvas>
+<div id="bg-overlay" aria-hidden="true"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function() {
+    const canvas = document.getElementById("bg-canvas");
+    if (!canvas || typeof THREE === "undefined") return;
+
+    const renderer = new THREE.WebGLRenderer({
+        canvas: canvas,
+        antialias: true,
+        alpha: true
+    });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(
+        60,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        200
+    );
+    camera.position.set(0, 0, 28);
+
+    const gold = new THREE.Color(0xc8b89a);
+    const dim = new THREE.Color(0x584f46);
+    const bright = new THREE.Color(0xe8e3dc);
+
+    const rings = [];
+    const ringMaterial = new THREE.MeshBasicMaterial({
+        color: gold,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.18
+    });
+    for (let index = 0; index < 5; index += 1) {
+        const geometry = new THREE.TorusGeometry(4 + index * 1.8, 0.06, 6, 48);
+        const mesh = new THREE.Mesh(geometry, ringMaterial.clone());
+        mesh.position.set(
+            (Math.random() - 0.5) * 30,
+            (Math.random() - 0.5) * 16,
+            (Math.random() - 0.5) * 12 - 5
+        );
+        mesh.rotation.set(
+            Math.random() * Math.PI,
+            Math.random() * Math.PI,
+            Math.random() * Math.PI
+        );
+        mesh.userData = {
+            speedX: (Math.random() - 0.5) * 0.0012,
+            speedY: (Math.random() - 0.5) * 0.0008,
+            driftX: (Math.random() - 0.5) * 0.003,
+            driftY: (Math.random() - 0.5) * 0.002
+        };
+        scene.add(mesh);
+        rings.push(mesh);
+    }
+
+    const shapes = [];
+    const shapeMaterial = new THREE.MeshBasicMaterial({
+        color: dim,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.22
+    });
+    for (let index = 0; index < 4; index += 1) {
+        const geometry = new THREE.IcosahedronGeometry(
+            1.4 + Math.random() * 1.2,
+            1
+        );
+        const mesh = new THREE.Mesh(geometry, shapeMaterial.clone());
+        mesh.position.set(
+            (Math.random() - 0.5) * 38,
+            (Math.random() - 0.5) * 20,
+            (Math.random() - 0.5) * 8 - 3
+        );
+        mesh.userData = {
+            speedX: (Math.random() - 0.5) * 0.004,
+            speedY: (Math.random() - 0.5) * 0.003,
+            driftX: (Math.random() - 0.5) * 0.004,
+            driftY: (Math.random() - 0.5) * 0.003
+        };
+        scene.add(mesh);
+        shapes.push(mesh);
+    }
+
+    const pointCount = 380;
+    const pointGeometry = new THREE.BufferGeometry();
+    const pointPositions = new Float32Array(pointCount * 3);
+    for (let index = 0; index < pointCount; index += 1) {
+        pointPositions[index * 3] = (Math.random() - 0.5) * 120;
+        pointPositions[index * 3 + 1] = (Math.random() - 0.5) * 60;
+        pointPositions[index * 3 + 2] = (Math.random() - 0.5) * 40 - 10;
+    }
+    pointGeometry.setAttribute(
+        "position",
+        new THREE.BufferAttribute(pointPositions, 3)
+    );
+    const pointMaterial = new THREE.PointsMaterial({
+        color: bright,
+        size: 0.06,
+        transparent: true,
+        opacity: 0.35
+    });
+    scene.add(new THREE.Points(pointGeometry, pointMaterial));
+
+    const lineGroup = new THREE.Group();
+    scene.add(lineGroup);
+    for (let index = 0; index < 18; index += 1) {
+        const originX = (Math.random() - 0.5) * 50;
+        const originY = (Math.random() - 0.5) * 28;
+        const originZ = (Math.random() - 0.5) * 14 - 6;
+        const length = 1.2 + Math.random() * 3.5;
+        const angle = Math.random() * Math.PI;
+        const points = [
+            new THREE.Vector3(originX, originY, originZ),
+            new THREE.Vector3(
+                originX + Math.cos(angle) * length,
+                originY + Math.sin(angle) * length,
+                originZ
+            )
+        ];
+        const geometry = new THREE.BufferGeometry().setFromPoints(points);
+        const material = new THREE.LineBasicMaterial({
+            color: Math.random() > 0.5 ? gold : dim,
+            transparent: true,
+            opacity: 0.12 + Math.random() * 0.1
+        });
+        const line = new THREE.Line(geometry, material);
+        line.userData = {
+            driftX: (Math.random() - 0.5) * 0.002,
+            driftY: (Math.random() - 0.5) * 0.001
+        };
+        lineGroup.add(line);
+    }
+
+    let mouseX = 0;
+    let mouseY = 0;
+    document.addEventListener("mousemove", function(event) {
+        mouseX = (event.clientX / window.innerWidth - 0.5) * 2;
+        mouseY = (event.clientY / window.innerHeight - 0.5) * 2;
+    });
+
+    window.addEventListener("resize", function() {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    let time = 0;
+    function animate() {
+        requestAnimationFrame(animate);
+        time += 0.008;
+
+        rings.forEach(function(mesh, index) {
+            mesh.rotation.x += mesh.userData.speedX;
+            mesh.rotation.y += mesh.userData.speedY;
+            mesh.position.x += Math.sin(time * 0.4 + index) * mesh.userData.driftX;
+            mesh.position.y += Math.cos(time * 0.3 + index) * mesh.userData.driftY;
+        });
+
+        shapes.forEach(function(mesh, index) {
+            mesh.rotation.x += mesh.userData.speedX;
+            mesh.rotation.y += mesh.userData.speedY;
+            mesh.position.x += Math.cos(time * 0.25 + index * 1.3) * mesh.userData.driftX;
+            mesh.position.y += Math.sin(time * 0.2 + index * 0.9) * mesh.userData.driftY;
+        });
+
+        lineGroup.children.forEach(function(line, index) {
+            line.position.x += Math.sin(time * 0.2 + index) * line.userData.driftX;
+            line.position.y += Math.cos(time * 0.15 + index) * line.userData.driftY;
+        });
+
+        camera.position.x += (mouseX * 1.8 - camera.position.x) * 0.025;
+        camera.position.y += (-mouseY - camera.position.y) * 0.025;
+        camera.lookAt(0, 0, 0);
+        renderer.render(scene, camera);
+    }
+    animate();
+})();
+</script>
 """, unsafe_allow_html=True)
+
+components.html(
+    (BASE_DIR / "assets/wireframe_background.html").read_text(encoding="utf-8"),
+    height=0,
+)
 
 if page == "Home/About":
     # Hero header
@@ -1020,7 +1327,7 @@ if page == "Home/About":
         ">One paste. One click.</p>
         <p style="max-width: 48ch;">
             Navigate to <strong style="color: #e8e3dc; font-weight: 600;">Text Analyzer</strong>
-            in the sidebar, paste any movie review, and press
+            in the top navigation, paste any movie review, and press
             <strong style="color: #e8e3dc; font-weight: 600;">Analyze Review</strong>.
             The model returns a prediction, confidence score, and word-level explanation.
         </p>
