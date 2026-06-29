@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <style>
+        html, body {
+            width: 0;
+            height: 0;
+            margin: 0;
+            overflow: hidden;
+            background: transparent;
+        }
+    </style>
+</head>
+<body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function () {
+    const parentWindow = window.parent;
+    const parentDocument = parentWindow.document;
+    const canvas = parentDocument.getElementById("bg-canvas");
+    if (!canvas || typeof THREE === "undefined") return;
+
+    const renderer = new THREE.WebGLRenderer({
+        canvas: canvas,
+        antialias: true,
+        alpha: true
+    });
+    renderer.setPixelRatio(Math.min(parentWindow.devicePixelRatio, 2));
+    renderer.setSize(parentWindow.innerWidth, parentWindow.innerHeight);
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(
+        60,
+        parentWindow.innerWidth / parentWindow.innerHeight,
+        0.1,
+        200
+    );
+    camera.position.set(0, 0, 28);
+
+    const gold = new THREE.Color(0xc8b89a);
+    const dim = new THREE.Color(0x584f46);
+    const bright = new THREE.Color(0xe8e3dc);
+
+    const rings = [];
+    for (let index = 0; index < 5; index += 1) {
+        const geometry = new THREE.TorusGeometry(4 + index * 1.8, 0.06, 6, 48);
+        const material = new THREE.MeshBasicMaterial({
+            color: gold,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.24
+        });
+        const mesh = new THREE.Mesh(geometry, material);
+        mesh.position.set(
+            (Math.random() - 0.5) * 30,
+            (Math.random() - 0.5) * 16,
+            (Math.random() - 0.5) * 12 - 5
+        );
+        mesh.rotation.set(
+            Math.random() * Math.PI,
+            Math.random() * Math.PI,
+            Math.random() * Math.PI
+        );
+        mesh.userData = {
+            speedX: (Math.random() - 0.5) * 0.0012,
+            speedY: (Math.random() - 0.5) * 0.0008,
+            driftX: (Math.random() - 0.5) * 0.003,
+            driftY: (Math.random() - 0.5) * 0.002
+        };
+        scene.add(mesh);
+        rings.push(mesh);
+    }
+
+    const shapes = [];
+    for (let index = 0; index < 4; index += 1) {
+        const geometry = new THREE.IcosahedronGeometry(
+            1.4 + Math.random() * 1.2,
+            1
+        );
+        const material = new THREE.MeshBasicMaterial({
+            color: dim,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.30
+        });
+        const mesh = new THREE.Mesh(geometry, material);
+        mesh.position.set(
+            (Math.random() - 0.5) * 38,
+            (Math.random() - 0.5) * 20,
+            (Math.random() - 0.5) * 8 - 3
+        );
+        mesh.userData = {
+            speedX: (Math.random() - 0.5) * 0.004,
+            speedY: (Math.random() - 0.5) * 0.003,
+            driftX: (Math.random() - 0.5) * 0.004,
+            driftY: (Math.random() - 0.5) * 0.003
+        };
+        scene.add(mesh);
+        shapes.push(mesh);
+    }
+
+    const pointCount = 380;
+    const pointGeometry = new THREE.BufferGeometry();
+    const pointPositions = new Float32Array(pointCount * 3);
+    for (let index = 0; index < pointCount; index += 1) {
+        pointPositions[index * 3] = (Math.random() - 0.5) * 120;
+        pointPositions[index * 3 + 1] = (Math.random() - 0.5) * 60;
+        pointPositions[index * 3 + 2] = (Math.random() - 0.5) * 40 - 10;
+    }
+    pointGeometry.setAttribute(
+        "position",
+        new THREE.BufferAttribute(pointPositions, 3)
+    );
+    scene.add(new THREE.Points(
+        pointGeometry,
+        new THREE.PointsMaterial({
+            color: bright,
+            size: 0.06,
+            transparent: true,
+            opacity: 0.42
+        })
+    ));
+
+    const lines = [];
+    for (let index = 0; index < 18; index += 1) {
+        const originX = (Math.random() - 0.5) * 50;
+        const originY = (Math.random() - 0.5) * 28;
+        const originZ = (Math.random() - 0.5) * 14 - 6;
+        const length = 1.2 + Math.random() * 3.5;
+        const angle = Math.random() * Math.PI;
+        const geometry = new THREE.BufferGeometry().setFromPoints([
+            new THREE.Vector3(originX, originY, originZ),
+            new THREE.Vector3(
+                originX + Math.cos(angle) * length,
+                originY + Math.sin(angle) * length,
+                originZ
+            )
+        ]);
+        const line = new THREE.Line(
+            geometry,
+            new THREE.LineBasicMaterial({
+                color: Math.random() > 0.5 ? gold : dim,
+                transparent: true,
+                opacity: 0.16 + Math.random() * 0.12
+            })
+        );
+        line.userData = {
+            driftX: (Math.random() - 0.5) * 0.002,
+            driftY: (Math.random() - 0.5) * 0.001
+        };
+        scene.add(line);
+        lines.push(line);
+    }
+
+    let mouseX = 0;
+    let mouseY = 0;
+    parentDocument.addEventListener("mousemove", function (event) {
+        mouseX = (event.clientX / parentWindow.innerWidth - 0.5) * 2;
+        mouseY = (event.clientY / parentWindow.innerHeight - 0.5) * 2;
+    });
+
+    parentWindow.addEventListener("resize", function () {
+        camera.aspect = parentWindow.innerWidth / parentWindow.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(parentWindow.innerWidth, parentWindow.innerHeight);
+    });
+
+    let time = 0;
+    function animate() {
+        if (!parentDocument.body.contains(canvas)) {
+            renderer.dispose();
+            return;
+        }
+
+        parentWindow.requestAnimationFrame(animate);
+        time += 0.008;
+
+        rings.forEach(function (mesh, index) {
+            mesh.rotation.x += mesh.userData.speedX;
+            mesh.rotation.y += mesh.userData.speedY;
+            mesh.position.x += Math.sin(time * 0.4 + index) * mesh.userData.driftX;
+            mesh.position.y += Math.cos(time * 0.3 + index) * mesh.userData.driftY;
+        });
+
+        shapes.forEach(function (mesh, index) {
+            mesh.rotation.x += mesh.userData.speedX;
+            mesh.rotation.y += mesh.userData.speedY;
+            mesh.position.x += Math.cos(time * 0.25 + index * 1.3) * mesh.userData.driftX;
+            mesh.position.y += Math.sin(time * 0.2 + index * 0.9) * mesh.userData.driftY;
+        });
+
+        lines.forEach(function (line, index) {
+            line.position.x += Math.sin(time * 0.2 + index) * line.userData.driftX;
+            line.position.y += Math.cos(time * 0.15 + index) * line.userData.driftY;
+        });
+
+        camera.position.x += (mouseX * 1.8 - camera.position.x) * 0.025;
+        camera.position.y += (-mouseY - camera.position.y) * 0.025;
+        camera.lookAt(0, 0, 0);
+        renderer.render(scene, camera);
+    }
+
+    animate();
+})();
+</script>
+</body>
+</html>
